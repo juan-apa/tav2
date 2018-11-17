@@ -3,6 +3,8 @@
 
 --data Persona = Asistente String String String | Docente String String String
 
+import Char
+
 -- ============= ASISTENTE =============
 data Asistente = Asistente String String String deriving (Show)
 
@@ -28,23 +30,27 @@ getCedula (Docente _ _ cedula) = cedula
 
 
 -- ============= CURSO =============
-data Curso = Curso Integer Docente String [Asistente] deriving (Show)
+--                 Codigo  Docente Nombre Fecha  Asistentes
+data Curso = Curso Integer Docente String String [Asistente] deriving (Show)
 
 getCodCurso :: Curso -> Integer
-getCodCurso (Curso cod _ _ _) = cod
+getCodCurso (Curso cod _ _ _ _) = cod
 
 getDocente :: Curso -> Docente
-getDocente (Curso _ docente _ _) = docente
+getDocente (Curso _ docente _ _ _) = docente
+
+getFecha :: Curso -> String
+getFecha (Curso _ _ _ fec _) = fec
 
 getAsistentes :: Curso -> [Asistente]
-getAsistentes (Curso _ _ _ lAsist) = lAsist
+getAsistentes (Curso _ _ _ _ lAsist) = lAsist
 
 instance Ord Curso where
-    (Curso cod _ _ _) > (Curso cod2 _ _ _) = (cod > cod2)
-    (Curso cod _ _ _) < (Curso cod2 _ _ _) = (cod < cod2)
+    (Curso cod _ _ _ _) > (Curso cod2 _ _ _ _) = (cod > cod2)
+    (Curso cod _ _ _ _) < (Curso cod2 _ _ _ _) = (cod < cod2)
 
 instance Eq Curso where
-    (Curso cod _ _ _) == (Curso cod2 _ _ _) = (cod == cod2)
+    (Curso cod _ _ _ _) == (Curso cod2 _ _ _ _) = (cod == cod2)
 
 
 cantAlumnosCurso :: Curso -> Integer
@@ -116,6 +122,33 @@ cursosMismosAlumnos l
     |(tail l) /= [] = (mismosAsistentes (getAsistentes (head l)) (getAsistentes(head (tail l)))) && cursosMismosAlumnos (tail l)
     |otherwise = True
 
+charToInteger :: Char -> Integer
+charToInteger c
+    | c == '0' = 0
+    | c == '1' = 1
+    | c == '2' = 2
+    | c == '3' = 3
+    | c == '4' = 4
+    | c == '5' = 5
+    | c == '6' = 6
+    | c == '7' = 7
+    | c == '8' = 8
+    | c == '9' = 9
+
+-- Devuelve True si f1 > f2
+compararFechas :: String -> String -> Bool
+compararFechas [] [] = True
+compararFechas f1 f2
+    |(charToInteger (head f1)) > (charToInteger (head f2)) = True
+    |(charToInteger (head f1)) < (charToInteger (head f2)) = False
+    |(charToInteger (head f1)) == (charToInteger (head f2)) = compararFechas (tail f1) (tail f2)
+
+listCursosAux :: Cursos Curso -> String-> [Curso]
+listCursosAux CursosVacio f = []
+listCursosAux (Nodo a left right) f 
+    |(compararFechas (getFecha a) f) = (listCursosAux left (getFecha a)) ++ [a] ++ (listCursosAux right (getFecha a))
+    |(compararFechas f (getFecha a)) = (listCursosAux right (getFecha a)) ++ [a] ++ (listCursosAux left (getFecha a))
+
 -- ========= Funciones Obligatorio =========
 
 -- 04) Devuelve si el docente dicto algun curso
@@ -152,10 +185,12 @@ listarCursosPorCodigo :: Cursos Curso -> [Curso]
 listarCursosPorCodigo abb = listCursos abb
 
 -- 10) Lista los cursos ordenados por Fecha
+listarCursosPorFecha :: Cursos Curso -> [Curso]
+listarCursosPorFecha abb = listCursosAux abb "00010101"
 
 -- 11) Retorna el curso con mas alumnos
 cursoMasAlumnos :: Cursos Curso -> Curso
-cursoMasAlumnos abb = foldr (comparadorCantAlumnosCurso) (Curso 0 (Docente "" "" "") "" []) (listCursos abb)
+cursoMasAlumnos abb = foldr (comparadorCantAlumnosCurso) (Curso 0 (Docente "" "" "") "" "" []) (listCursos abb)
 
 -- 12) Dada la cedula de un alumno y el abb devuelve lista de cursos asistidos por el alumno.
 listarCursosAsistidos :: Cursos Curso -> String -> [Curso]
@@ -168,9 +203,16 @@ hayCursosMismosAlumnos abb = (cursosMismosAlumnos (listCursos abb))
 asist = Asistente "Nombre" "Apellido" "Cedula" 
 asis2 = Asistente "Nombre1" "Apellido1" "Cedula1" 
 docente = Docente "Nombre" "Apellido" "Cedula" 
-curso = Curso 0 docente "NombreMateria" [asist]
-curso2 = Curso 1 docente "NombreMateria2" [asist]
-cursos = (insertarCurso curso) (crearHoja curso2)
+curso1 = Curso 0 docente "NombreMateria1" "20180101" [asist]
+curso2 = Curso 1 docente "NombreMateria2" "20180102" [asist]
+curso3 = Curso 2 docente "NombreMateria2" "20180103" [asist]
+curso4 = Curso 3 docente "NombreMateria2" "20180104" [asist]
+curso5 = Curso 4 docente "NombreMateria2" "20180105" [asist]
+cursos = (insertarCurso curso2) (crearHoja curso1)
+cursos2 = insertarCurso curso4 cursos
+cursos3 = insertarCurso curso3 cursos2
+cursos4 = insertarCurso curso5 cursos3
+
 
 lcur = listCursos cursos
 ldoccur = listDocentesCursos lcur
