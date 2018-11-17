@@ -200,6 +200,8 @@ listarCursosAsistidos abb ced = filter ((alumnoEnAsistentes ced).getAsistentes) 
 hayCursosMismosAlumnos :: Cursos Curso -> Bool
 hayCursosMismosAlumnos abb = (cursosMismosAlumnos (listCursos abb))
 
+
+-- ============= DATOS DE PRUEBA =============
 asist = Asistente "Nombre" "Apellido" "Cedula" 
 asis2 = Asistente "Nombre1" "Apellido1" "Cedula1" 
 docente = Docente "Nombre" "Apellido" "Cedula" 
@@ -212,7 +214,5 @@ cursos = (insertarCurso curso2) (crearHoja curso1)
 cursos2 = insertarCurso curso4 cursos
 cursos3 = insertarCurso curso3 cursos2
 cursos4 = insertarCurso curso5 cursos3
-
-
 lcur = listCursos cursos
 ldoccur = listDocentesCursos lcur
