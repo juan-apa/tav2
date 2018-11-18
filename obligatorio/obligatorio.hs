@@ -1,8 +1,3 @@
---data Asistente= nombre String| cedula String deriving Show
---data Curso = codigo Integer| docente Asistente| nombreCurso String| fecha String| asistentes [Asistente] deriving Show
-
---data Persona = Asistente String String String | Docente String String String
-
 import Char
 
 -- ============= ASISTENTE =============
@@ -52,6 +47,9 @@ instance Ord Curso where
 instance Eq Curso where
     (Curso cod _ _ _ _) == (Curso cod2 _ _ _ _) = (cod == cod2)
 
+
+agregarAsistenteCurso :: Curso -> String -> String -> String -> Curso
+agregarAsistenteCurso (Curso cod doc nom fec asis) nomA ape ced = (Curso cod doc nom fec (agregarAsistente asis nomA ape ced))
 
 cantAlumnosCurso :: Curso -> Integer
 cantAlumnosCurso c = toInteger (length (getAsistentes c))
@@ -179,6 +177,11 @@ yaEstaRegistrado abb ced cod
     |otherwise = False
 
 -- 08)  insertarAlumno
+insertarAlumno :: Cursos Curso -> Integer -> String -> String -> String -> Cursos Curso
+insertarAlumno (Nodo cur left right) cod nom ape ced
+    |cod == (getCodCurso cur) = (Nodo (agregarAsistenteCurso cur nom ape ced) left right)
+    |cod < (getCodCurso cur) = Nodo cur (insertarAlumno left cod nom ape ced) right
+    |cod > (getCodCurso cur) = Nodo cur left (insertarAlumno right cod nom ape ced)
 
 -- 09) Lista los cursos ordenados por codigo
 listarCursosPorCodigo :: Cursos Curso -> [Curso]
