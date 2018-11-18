@@ -1,4 +1,5 @@
 import Char
+import List
 
 -- ============= ASISTENTE =============
 data Asistente = Asistente String String String deriving (Show)
@@ -6,11 +7,20 @@ data Asistente = Asistente String String String deriving (Show)
 instance Eq Asistente where
     (Asistente nom1 ap1 ced1) == (Asistente nom2 ap2 ced2) = ((nom1 == nom2) && (ap1 == ap2) && (ced1 == ced2))
 
+instance Ord Asistente where
+    (Asistente _ ap1 _ ) > (Asistente _ ap2 _ ) = (ap1 > ap2)
+    (Asistente _ ap1 _ ) < (Asistente _ ap2 _ ) = (ap1 < ap2)
+    (Asistente _ ap1 _ ) >= (Asistente _ ap2 _ ) = (ap1 >= ap2)
+    (Asistente _ ap1 _ ) <= (Asistente _ ap2 _ ) = (ap1 <= ap2)
+
 getCedulaAS :: Asistente -> String
 getCedulaAS (Asistente _ _ cedula) = cedula
 
 agregarAsistente :: [Asistente] -> String -> String -> String -> [Asistente] 
 agregarAsistente l nom ap ced = l ++ [(Asistente nom ap ced)]
+
+agregarAsistenteOrd :: [Asistente] -> String -> String -> String -> [Asistente]
+agregarAsistenteOrd l nom ap ced = sort (agregarAsistente l nom ap ced)
 
 
 -- ============= DOCENTE =============
@@ -49,7 +59,7 @@ instance Eq Curso where
 
 
 agregarAsistenteCurso :: Curso -> String -> String -> String -> Curso
-agregarAsistenteCurso (Curso cod doc nom fec asis) nomA ape ced = (Curso cod doc nom fec (agregarAsistente asis nomA ape ced))
+agregarAsistenteCurso (Curso cod doc nom fec asis) nomA ape ced = (Curso cod doc nom fec (agregarAsistenteOrd asis nomA ape ced))
 
 cantAlumnosCurso :: Curso -> Integer
 cantAlumnosCurso c = toInteger (length (getAsistentes c))
